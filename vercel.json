@@ -1,16 +1,6 @@
 {
   "buildCommand": "pip install -r requirements.txt",
-  "functions": {
-    "wsgi.py": {
-      "runtime": "python3.9"
-    }
-  },
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "wsgi.py"
-    }
-  ],
+  "framework": "python",
   "env": {
     "FLASK_ENV": "production",
     "SQLALCHEMY_DATABASE_URI": "sqlite:///absensi.db"
