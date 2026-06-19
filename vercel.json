@@ -13,9 +13,6 @@
   ],
   "env": {
     "FLASK_ENV": "production",
-    "SQLALCHEMY_DATABASE_URI": {
-      "description": "Database connection string",
-      "value": "sqlite:///absensi.db"
-    }
+    "SQLALCHEMY_DATABASE_URI": "sqlite:///absensi.db"
   }
 }
