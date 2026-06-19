@@ -71,6 +71,15 @@ class Absensi(db.Model):
 def create_tables():
     db.create_all()
 
+@app.route('/api/health')
+def health_check():
+    """Health check endpoint for testing"""
+    return jsonify({
+        'status': 'ok',
+        'message': 'Server is running',
+        'database': 'connected' if db.engine else 'disconnected'
+    }), 200
+
 @app.route('/')
 def dashboard():
     return render_template('dashboard.html')
