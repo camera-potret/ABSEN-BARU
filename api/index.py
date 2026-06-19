@@ -1,10 +1,12 @@
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+# Add parent directory to path so we can import app
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app
 
-# For Vercel serverless function
-def handler(request):
-    return app(request)
+# Vercel expects this for Python/Flask
+export = app.wsgi_app
+
 
