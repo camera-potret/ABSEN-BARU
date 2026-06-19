@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Absensi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Sistem Absensi</h1>
+                <p id="kegiatan-title" class="subtitle">-</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Settings Section -->
+            <section class="section" id="settings-section">
+                <h2>Pengaturan Kegiatan</h2>
+                <form id="kegiatan-form" class="form">
+                    <div class="form-group">
+                        <label for="nama">Nama Kegiatan *</label>
+                        <input type="text" id="nama" name="nama" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="deskripsi">Deskripsi</label>
+                            <textarea id="deskripsi" name="deskripsi" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="jadwal">Jadwal Kegiatan</label>
+                            <input type="datetime-local" id="jadwal" name="jadwal">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="link_id">ID Link</label>
+                            <div class="input-group">
+                                <input type="text" id="link_id" name="link_id" readonly>
+                                <button type="button" class="btn btn-secondary" onclick="generateNewLink()">Generate Baru</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="wa_group_link">Link Grup WA</label>
+                            <input type="url" id="wa_group_link" name="wa_group_link" placeholder="https://chat.whatsapp.com/...">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+
+                <div class="qr-section">
+                    <h3>QR Code</h3>
+                    <div class="qr-container">
+                        <img id="qr-code" src="" alt="QR Code" style="display: none;">
+                    </div>
+                    <button id="download-qr-btn" class="btn btn-secondary" style="display: none;">Download QR Code</button>
+                    <div id="absensi-link-container" style="display: none;" class="link-container">
+                        <p>Link Absensi:</p>
+                        <div class="link-box">
+                            <input type="text" id="absensi-link" readonly>
+                            <button type="button" class="btn btn-small" onclick="copyAbsensiLink()">Copy</button>
+                        </div>
+                        <button id="go-to-absensi-btn" class="btn btn-success">Masuk ke Link Absensi</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Import/Export Section -->
+            <section class="section">
+                <h2>Data Peserta</h2>
+                <div class="data-actions">
+                    <div class="action-group">
+                        <h3>Import Data</h3>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display: none;">
+                            <button type="button" class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                                📥 Import Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="action-group">
+                        <h3>Ekspor Data</h3>
+                        <button type="button" class="btn btn-primary" onclick="exportExcel()">
+                            📤 Export Excel
+                        </button>
+                    </div>
+
+                    <div class="action-group">
+                        <h3>Reset Data</h3>
+                        <button type="button" class="btn btn-danger" onclick="resetData()">
+                            🔄 Reset (Hapus Semua Data)
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="section">
+                <h2>Statistik Kehadiran</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="total-peserta">0</div>
+                            <div class="stat-label">Total Peserta</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card success">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="masuk-count">0</div>
+                            <div class="stat-label">Masuk</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card warning">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="terlambat-count">0</div>
+                            <div class="stat-label">Terlambat</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card info">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="izin-count">0</div>
+                            <div class="stat-label">Izin</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card danger">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="belum-masuk-count">0</div>
+                            <div class="stat-label">Belum Masuk</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Peserta List Section -->
+            <section class="section">
+                <h2>Daftar Peserta</h2>
+                <div class="filter-container">
+                    <input type="text" id="peserta-filter" placeholder="Cari peserta...">
+                    <select id="status-filter">
+                        <option value="">Semua Status</option>
+                        <option value="masuk">Masuk</option>
+                        <option value="terlambat">Terlambat</option>
+                        <option value="izin">Izin</option>
+                        <option value="belum_masuk">Belum Masuk</option>
+                    </select>
+                </div>
+
+                <div id="peserta-list" class="peserta-list">
+                    <!-- Peserta list akan diisi oleh JavaScript -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
