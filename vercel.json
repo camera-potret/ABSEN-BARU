@@ -13,6 +13,6 @@
   ],
   "env": {
     "FLASK_ENV": "production",
-    "SQLALCHEMY_DATABASE_URI": "sqlite:///absensi.db"
+    "DATABASE_URL": "@postgres_url"
   }
 }

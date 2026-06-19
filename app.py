@@ -12,7 +12,16 @@ from werkzeug.utils import secure_filename
 import uuid
 
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///absensi.db'
+
+# Database configuration - use PostgreSQL on Vercel, SQLite locally
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # For Vercel PostgreSQL
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Local development with SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///absensi.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
