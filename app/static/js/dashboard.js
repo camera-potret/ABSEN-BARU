@@ -4,6 +4,21 @@ let currentKegiatan = null;
 let pesertaList = [];
 let allPeserta = [];
 
+// ==================== LOADING FUNCTIONS ====================
+function showLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.add('active');
+    }
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadKegiatan();
@@ -29,6 +44,7 @@ function setupEventListeners() {
 
 // ==================== KEGIATAN MANAGEMENT ====================
 async function loadKegiatan() {
+    showLoading();
     try {
         const response = await fetch('/api/kegiatan');
         const data = await response.json();
@@ -37,8 +53,8 @@ async function loadKegiatan() {
             currentKegiatan = data;
             populateForm(data);
             updateQRCode();
-            loadPesertaList();
-            refreshStats();
+            await loadPesertaList();
+            await refreshStats();
         } else {
             // Create default kegiatan
             const linkId = generateLinkId();
@@ -48,6 +64,8 @@ async function loadKegiatan() {
     } catch (error) {
         console.error('Error loading kegiatan:', error);
         showAlert('Error memuat data kegiatan', 'error');
+    } finally {
+        hideLoading();
     }
 }
 
@@ -116,6 +134,7 @@ async function handleFileUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
     
+    showLoading();
     const formData = new FormData();
     formData.append('file', file);
     
@@ -137,6 +156,8 @@ async function handleFileUpload(e) {
     } catch (error) {
         console.error('Error:', error);
         showAlert('Error mengimport data', 'error');
+    } finally {
+        hideLoading();
     }
     
     // Reset file input
@@ -153,6 +174,8 @@ async function loadPesertaList() {
         filterPeserta();
     } catch (error) {
         console.error('Error loading peserta:', error);
+    } finally {
+        hideLoading();
     }
 }
 
@@ -232,7 +255,11 @@ function copyAbsensiLink() {
 }
 
 function exportExcel() {
-    window.location.href = '/api/export/excel';
+    showLoading();
+    setTimeout(() => {
+        window.location.href = '/api/export/excel';
+        hideLoading();
+    }, 500);
 }
 
 async function resetData() {
@@ -240,6 +267,7 @@ async function resetData() {
         return;
     }
     
+    showLoading();
     try {
         const response = await fetch('/api/reset', {
             method: 'POST'
@@ -269,6 +297,7 @@ async function resetData() {
     } catch (error) {
         console.error('Error:', error);
         showAlert('Error mereset data', 'error');
+        hideLoading();
     }
 }
 

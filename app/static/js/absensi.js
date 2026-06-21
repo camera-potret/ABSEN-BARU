@@ -4,6 +4,21 @@ let currentKegiatan = null;
 let selectedPeserta = null;
 let allPeserta = [];
 
+// ==================== LOADING FUNCTIONS ====================
+function showLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.add('active');
+    }
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadKegiatanInfo();
@@ -34,6 +49,7 @@ function setupEventListeners() {
 
 // ==================== KEGIATAN INFO ====================
 async function loadKegiatanInfo() {
+    showLoading();
     try {
         const response = await fetch('/api/kegiatan');
         const data = await response.json();
@@ -79,6 +95,8 @@ async function loadKegiatanInfo() {
     } catch (error) {
         console.error('Error loading kegiatan info:', error);
         showAlert('Error memuat informasi kegiatan', 'error');
+    } finally {
+        hideLoading();
     }
 }
 
@@ -90,6 +108,8 @@ async function loadPeserta() {
     } catch (error) {
         console.error('Error loading peserta:', error);
         showAlert('Error memuat data peserta', 'error');
+    } finally {
+        hideLoading();
     }
 }
 
@@ -229,6 +249,7 @@ async function submitMasuk() {
         return;
     }
     
+    showLoading();
     try {
         const response = await fetch('/api/absensi/masuk', {
             method: 'POST',
@@ -251,10 +272,12 @@ async function submitMasuk() {
             await loadPeserta();
         } else {
             showAlert('Error menyimpan data', 'error');
+            hideLoading();
         }
     } catch (error) {
         console.error('Error:', error);
         showAlert('Error menyimpan data', 'error');
+        hideLoading();
     }
 }
 
@@ -266,6 +289,7 @@ async function submitIzin() {
     
     const alasan = document.getElementById('alasan-izin').value.trim();
     
+    showLoading();
     try {
         const response = await fetch('/api/absensi/izin', {
             method: 'POST',
@@ -287,10 +311,12 @@ async function submitIzin() {
             await loadPeserta();
         } else {
             showAlert('Error menyimpan data', 'error');
+            hideLoading();
         }
     } catch (error) {
         console.error('Error:', error);
         showAlert('Error menyimpan data', 'error');
+        hideLoading();
     }
 }
 
